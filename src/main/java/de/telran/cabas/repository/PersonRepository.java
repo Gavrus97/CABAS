@@ -12,4 +12,10 @@ public interface PersonRepository extends JpaRepository<Person, Long> {
     boolean existsByPhoneNumber(String phoneNumber);
 
     List<Person> findAllByGuardianId(Long guardianId);
+
+    boolean existsByFirstNameAndLastName(String firstName, String lastName);
+
+    boolean existsById(Long id);
+
+    List<Person> findAllByIdIsIn(List<Long> ids);
 }

@@ -1,5 +1,6 @@
 package de.telran.cabas.service;
 
+import de.telran.cabas.dto.request.ChangeGuardianRequestDTO;
 import de.telran.cabas.dto.request.PersonRequestDTO;
 import de.telran.cabas.dto.request.UpdatePersonRequestDTO;
 import de.telran.cabas.dto.response.PersonResponseDTO;
@@ -10,5 +11,5 @@ public interface PersonService {
 
     void update (Long id, UpdatePersonRequestDTO personDTO);
 
-
+    PersonResponseDTO changeGuardian(Long guardianId, ChangeGuardianRequestDTO changeGuardianRequestDTO);
 }
