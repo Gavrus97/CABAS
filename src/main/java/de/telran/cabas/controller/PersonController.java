@@ -1,9 +1,11 @@
 package de.telran.cabas.controller;
 
+import de.telran.cabas.dto.request.ChangeCityRequestDTO;
 import de.telran.cabas.dto.request.ChangeGuardianRequestDTO;
 import de.telran.cabas.dto.request.PersonRequestDTO;
 import de.telran.cabas.dto.request.UpdatePersonRequestDTO;
 import de.telran.cabas.dto.response.PersonResponseDTO;
+import de.telran.cabas.dto.response.ResponseExceptionDTO;
 import de.telran.cabas.service.PersonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -30,5 +32,20 @@ public class PersonController {
     public PersonResponseDTO changeGuardian(@PathVariable("fromGuardianId") Long guardianId,
                                             @RequestBody ChangeGuardianRequestDTO changeGuardianRequestDTO){
         return service.changeGuardian(guardianId, changeGuardianRequestDTO);
+    }
+
+    @GetMapping("/people/{id}")
+    public PersonResponseDTO getById(@PathVariable("id") Long id){
+        return service.getPersonById(id);
+    }
+
+    @GetMapping("/people")
+    public PersonResponseDTO getByEmail(@RequestParam("email") String email){
+        return service.getPersonByEmail(email);
+    }
+
+    @PostMapping("/people/move")
+    public PersonResponseDTO moveToAnotherCity(@RequestBody ChangeCityRequestDTO changeDTO){
+        return service.moveToAnotherCity(changeDTO);
     }
 }

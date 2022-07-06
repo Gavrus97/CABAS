@@ -1,6 +1,7 @@
 package de.telran.cabas.service.impl;
 
 import de.telran.cabas.converter.Converters;
+import de.telran.cabas.dto.request.ChangeCityRequestDTO;
 import de.telran.cabas.dto.request.ChangeGuardianRequestDTO;
 import de.telran.cabas.dto.request.PersonRequestDTO;
 import de.telran.cabas.dto.request.UpdatePersonRequestDTO;
@@ -99,6 +100,7 @@ public class PersonServiceImpl implements PersonService {
     }
 
     @Override
+    @Transactional
     public PersonResponseDTO changeGuardian(Long guardianId, ChangeGuardianRequestDTO changeGuardianRequestDTO) {
         checkIfExistsById(guardianId);
         var existingChildren = getChildren(guardianId);
@@ -122,6 +124,97 @@ public class PersonServiceImpl implements PersonService {
         var cityId = getCityId(toGuardian);
 
         return Converters.convertPersonIntoResponseDTO(toGuardian, areaId, null, allChildren, cityId);
+    }
+
+    @Override
+    public PersonResponseDTO getPersonById(Long id) {
+        var person = getPersonByIdOrThrow(id);
+        return Converters.convertPersonIntoResponseDTO(person,
+                getAreaId(person.getCity()),
+                getPersonByIdOrThrow(person.getGuardianId()),
+                getChildren(id),
+                getCityId(person));
+    }
+
+
+    @Override
+    public PersonResponseDTO getPersonByEmail(String email) {
+        var person = findPersonByEmailOrThrow(email);
+        return getPersonById(person.getId());
+    }
+
+
+    @Override
+    @Transactional
+    public PersonResponseDTO moveToAnotherCity(ChangeCityRequestDTO cityDTO) {
+        var person = getPersonByIdOrThrow(cityDTO.getPersonId());
+
+        if(person.getGuardianId() != null){
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY,
+                    "The person who has a guardian cannot be moved to another city! ");
+        }
+
+        checkIfFromCityMatch(person.getCity(), cityDTO.getFromCityId());
+        var city = checkIfToCityMatch(cityDTO.getToCityId());
+
+
+        var children = getChildren(person.getId());
+        children.forEach(pers -> pers.setCity(city));
+        repository.saveAll(children);
+
+        person.setCity(city);
+        repository.save(person);
+
+
+        return Converters.convertPersonIntoResponseDTO(person, getAreaId(city), null, children, city.getId());
+    }
+
+
+
+    private Person findPersonByEmailOrThrow(String email) {
+        if (email == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                    String.format("There is no person with email [%s]", email));
+        }
+        var person = repository.findByEmail(email);
+
+        if (person == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                    String.format("There is no person with email [%s]", email));
+        }
+        return person;
+    }
+
+
+    private City checkIfToCityMatch(Long cityToMatchId){
+        if (cityToMatchId == null){
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "[toCity]: Person cannot be moved to the city with id [null]");
+        }
+
+        return cityRepository.findById(cityToMatchId).orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                String.format("[toCity]: The city with id [%s] doesn't exist! ", cityToMatchId)));
+    }
+
+    private void checkIfFromCityMatch(City city, Long cityToCheckId) {
+        if (city != null && cityToCheckId == null) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    String.format("[fromCity] parameter doesn't match! The person lives in the city with id [%s]"
+                            , city.getId()));
+        }
+
+        if (city == null && cityToCheckId != null) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    String.format("[formCity]: The person doesn't live in the city with id [%s], ", cityToCheckId) +
+                            "he's cityId is [null]");
+        }
+
+        if (city != null && !city.getId().equals(cityToCheckId)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    String.format("[fromCity]: The person lives in the city with id [%s], ", city.getId()) +
+                            String.format("but not in the city with id [%s]. ", cityToCheckId));
+        }
     }
 
     private void checkIfExistsById(Long id) {
