@@ -10,9 +10,16 @@ import org.springframework.http.HttpStatus;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+// Your own convention mismatch
+// other classes names' structure: Name + Request/Response + DTO
+// this class...
+// would suggest names:
+// - ApiErrorResponseDTO
+// - RestErrorResponseDTO
+// - CabasErrorResponseDTO
+// - CabasApiErrorResponseDTO
 public class ResponseExceptionDTO {
 
     private HttpStatus status;
-
     private String message;
 }

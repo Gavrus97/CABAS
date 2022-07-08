@@ -9,6 +9,7 @@ import de.telran.cabas.entity.City;
 import de.telran.cabas.repository.AreaRepository;
 import de.telran.cabas.repository.CityRepository;
 import de.telran.cabas.service.AreaService;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -19,23 +20,25 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@AllArgsConstructor
 public class AreaServiceImpl implements AreaService {
 
-    @Autowired
-    private AreaRepository repository;
-
-    @Autowired
-    private CityRepository cityRepository;
+    // can be less new lines
+    private final AreaRepository repository;
+    private final CityRepository cityRepository;
 
     @Override
     @Transactional
     public AreaResponseDTO create(AreaRequestDTO areaRequestDto) {
 
+        // a common approach - is to lowercase instead
         if (repository.existsByAreaName(areaRequestDto.getAreaName().toUpperCase())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
                     String.format("Area with name [%s] already exists ", areaRequestDto.getAreaName()));
         }
 
+        // Converters - is a HUGE class, containing all conversions
+        // it would be better to split it onto smaller pieces (CityConverter, AreaConverter, etc)
         var area = Converters.convertToAreaEntity(areaRequestDto);
         repository.save(area);
 
@@ -46,9 +49,14 @@ public class AreaServiceImpl implements AreaService {
     public List<AreaWithCitiesResponseDTO> getAll() {
         var areas = repository.findAll();
 
-        if(areas.isEmpty()){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                    "There is no area in database yet ");
+        // Can't see any mentions of 404 in docs
+        // This is a rare case, when list returns anything, but list ([], [1,2,3])
+        // This does not apply to single entities (null, 404)
+        if (areas.isEmpty()) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    "There is no area in database yet"
+            );
         }
 
         return areas
@@ -64,21 +72,24 @@ public class AreaServiceImpl implements AreaService {
     @Override
     public AreaWithCitiesResponseDTO getByName(String name) {
         var area = findAreaByNameOrThrow(name.toUpperCase());
-        return Converters.convertAreaToAreaWithCitiesDTO(area,getCityIdsByAreaId(area.getId()));
+        return Converters.convertAreaToAreaWithCitiesDTO(area, getCityIdsByAreaId(area.getId()));
     }
 
-    private Area findAreaByNameOrThrow(String name){
+    private Area findAreaByNameOrThrow(String name) {
+        // same here about lowercase
         var area = repository.findByAreaName(name.toUpperCase());
 
-        if(area == null){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                    String.format("There is no area with name [%s] ", name));
+        if (area == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    String.format("There is no area with name [%s] ", name)
+            );
         }
         return area;
     }
 
 
-    private List<Long> getCityIdsByAreaId(Long id){
+    private List<Long> getCityIdsByAreaId(Long id) {
         return cityRepository.findAllByAreaId(id)
                 .stream()
                 .map(City::getId)

@@ -11,9 +11,6 @@ import java.util.List;
 public class AreaWithCitiesResponseDTO {
 
     private Long areaId;
-
     private String areaName;
-
     private List<Long> cityIds;
-
 }

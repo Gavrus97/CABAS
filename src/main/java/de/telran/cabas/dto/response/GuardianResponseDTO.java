@@ -12,11 +12,8 @@ import lombok.NoArgsConstructor;
 public class GuardianResponseDTO {
 
     private String firstName;
-
     private String lastName;
-
     private String phoneNumber;
-
     private String email;
 
 
