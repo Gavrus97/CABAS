@@ -4,6 +4,7 @@ import de.telran.cabas.dto.request.AreaRequestDTO;
 import de.telran.cabas.dto.response.AreaResponseDTO;
 import de.telran.cabas.dto.response.AreaWithCitiesResponseDTO;
 import de.telran.cabas.service.AreaService;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,10 +13,13 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api")
+@AllArgsConstructor
 public class AreaController {
 
-    @Autowired
-    private AreaService service;
+    // final requires for Java to demand a ctor
+    // spring thinks: the only ctor - is an Autowired ctor
+    // lombok + spring make the magic
+    private final AreaService service;
 
     @PostMapping("/areas")
     public AreaResponseDTO create(@RequestBody AreaRequestDTO areaDto) {

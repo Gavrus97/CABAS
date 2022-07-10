@@ -15,6 +15,8 @@ public interface PersonRepository extends JpaRepository<Person, Long> {
 
     boolean existsByFirstNameAndLastName(String firstName, String lastName);
 
+    // see a blue circle from the left?
+    // this means, you're overriding spring's default method
     boolean existsById(Long id);
 
     List<Person> findAllByIdIsIn(List<Long> ids);

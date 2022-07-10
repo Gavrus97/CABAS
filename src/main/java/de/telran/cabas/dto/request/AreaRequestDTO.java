@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Data
 public class AreaRequestDTO {
-
+    // offtop
+    // this is why Java is being hated: a class for a single property :)
     private String areaName;
 }

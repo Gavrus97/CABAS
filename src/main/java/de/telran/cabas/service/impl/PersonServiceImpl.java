@@ -14,6 +14,7 @@ import de.telran.cabas.service.PersonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.core.RepositoryCreationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -27,11 +28,20 @@ import java.util.stream.Collectors;
 
 import static com.fasterxml.jackson.databind.type.LogicalType.Collection;
 
+// this service is TOO HUGE
+// should split it onto a couple or reduce the amount of logic
+// possible reducing directions:
+// - moving some search logic to SQL
+// - less depend on IDs (moving logic to SQL)
 @Service
 public class PersonServiceImpl implements PersonService {
 
+    // same here about final injections
+
     @Autowired
     private PersonRepository repository;
+
+    // same here about final injections
 
     @Autowired
     private CityRepository cityRepository;
@@ -39,6 +49,9 @@ public class PersonServiceImpl implements PersonService {
     @Override
     @Transactional
     public PersonResponseDTO create(PersonRequestDTO personDTO) {
+        // should perform all those operations in as single SQL request
+        // the main idea - having LESS sql requests possible
+
         checkEmail(personDTO.getEmail());
         checkPhoneNumber(personDTO.getPhoneNumber());
         checkName(personDTO.getFirstName(), personDTO.getLastName());
@@ -146,20 +159,31 @@ public class PersonServiceImpl implements PersonService {
 
     @Override
     @Transactional
+    // I believe, this is an overhead and overengineering
+    // Checking too many cases, which are not relevant
+    //
     public PersonResponseDTO moveToAnotherCity(ChangeCityRequestDTO cityDTO) {
         var person = getPersonByIdOrThrow(cityDTO.getPersonId());
 
+        // may get NPE here
         if(person.getGuardianId() != null){
-            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY,
-                    "The person who has a guardian cannot be moved to another city! ");
+            throw new ResponseStatusException(
+                    HttpStatus.UNPROCESSABLE_ENTITY,
+                    "A person having a guardian - cannot be moved alone"
+            );
         }
 
+        // this method name is not self-descriptive
+        // check if from city match ... match what?
+        // need a bit more personalized names
         checkIfFromCityMatch(person.getCity(), cityDTO.getFromCityId());
         var city = checkIfToCityMatch(cityDTO.getToCityId());
 
 
+        // since we're using JPA, it is a cleaner option to use method(person),
+        // instead of method(person.getId())
         var children = getChildren(person.getId());
-        children.forEach(pers -> pers.setCity(city));
+        children.forEach(child -> child.setCity(city));
         repository.saveAll(children);
 
         person.setCity(city);
@@ -172,15 +196,25 @@ public class PersonServiceImpl implements PersonService {
 
 
     private Person findPersonByEmailOrThrow(String email) {
+        // this part should be covered via Validation API
+        // if validator says ok - we start trusting the input data
+
+        // if the input is null - this is 400
+        // another point - this part is not reachable. Ever.
+        // spring will not allow null values thru the controller, unless explicitly allowed
         if (email == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,
                     String.format("There is no person with email [%s]", email));
         }
+
+        // can have here Optional<Person> to use .orElseThrow as we do for others
         var person = repository.findByEmail(email);
 
         if (person == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                    String.format("There is no person with email [%s]", email));
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    String.format("There is no person with email [%s]", email)
+            );
         }
         return person;
     }
@@ -198,20 +232,27 @@ public class PersonServiceImpl implements PersonService {
     }
 
     private void checkIfFromCityMatch(City city, Long cityToCheckId) {
+        // this case is irrelevant
         if (city != null && cityToCheckId == null) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT,
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
                     String.format("[fromCity] parameter doesn't match! The person lives in the city with id [%s]"
                             , city.getId()));
         }
 
+        // This case is not realistic. A person is always assigned to a city
         if (city == null && cityToCheckId != null) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT,
-                    String.format("[formCity]: The person doesn't live in the city with id [%s], ", cityToCheckId) +
-                            "he's cityId is [null]");
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    // Gender-specific messages. should avoid using his/her pronouns at all
+                    String.format("[formCity]: The person doesn't live in the city with id [%s], he's cityId is [null]", cityToCheckId));
         }
 
+        // not sure, I understand the meaning of this case at all...
         if (city != null && !city.getId().equals(cityToCheckId)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT,
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    // why there are 2 string formats?
                     String.format("[fromCity]: The person lives in the city with id [%s], ", city.getId()) +
                             String.format("but not in the city with id [%s]. ", cityToCheckId));
         }
@@ -235,6 +276,7 @@ public class PersonServiceImpl implements PersonService {
 
     private void checkName(String firstName, String lastName) {
 
+        // leaving commented code is a bad practice
 //        if(firstName == null || lastName == null){
 //            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY,
 //                    "Name or last name cannot be null");
@@ -250,6 +292,9 @@ public class PersonServiceImpl implements PersonService {
                                       List<Person> existingChildren,
                                       List<Long> childrenIdsToCheck) {
 
+        // IDE highlights the problem
+        // if 'childrenIdsToCheck' is null - the code will fail on NPE on .isEmpty() check
+        // the chain will never reach 'childrenIdsToCheck == null': NPE or ok
         if (childrenIdsToCheck.isEmpty() || childrenIdsToCheck == null) {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
                     "People that may be moved are not present! ");
@@ -260,12 +305,12 @@ public class PersonServiceImpl implements PersonService {
                     String.format("The person with id [%s] has no children! ", guardianId));
         }
 
-        List<Long> existingIds = new ArrayList<>(existingChildren)
+        List<Long> existingIds = existingChildren // <- no need in wrapping + you get additional O(n) complexity
                 .stream()
                 .map(Person::getId)
                 .collect(Collectors.toList());
 
-        List<Long> temp = new ArrayList<>(childrenIdsToCheck)
+        List<Long> temp = new ArrayList<>(childrenIdsToCheck) //same here
                 .stream()
                 .filter(x -> !existingIds.contains(x))
                 .collect(Collectors.toList());
@@ -293,14 +338,18 @@ public class PersonServiceImpl implements PersonService {
         }
     }
 
+    @Nullable // added to enable IDE highlighting
     private Person getPersonByIdOrThrow(Long id) {
+        // should add Validation API and remove this part
         if (id == null) {
-            return null;
+            return null; // line 164 - will get a surprise! NPE
         }
 
         return repository.findById(id).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        String.format("No person with id [%s] found", id)));
+                new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        String.format("No person with id [%s] found", id))
+        );
     }
 
     private void checkIfCanBeGuardian(Person person) {

@@ -20,8 +20,11 @@ import java.util.stream.Collectors;
 @Service
 public class CityServiceImpl implements CityService {
 
+    // same here about final injections
     @Autowired
     private CityRepository repository;
+
+    // same here about final injections
 
     @Autowired
     private AreaRepository areaRepository;
@@ -29,8 +32,10 @@ public class CityServiceImpl implements CityService {
     @Override
     public CityResponseDTO create(CityRequestDTO cityRequestDTO) {
         if (repository.existsByCityName(cityRequestDTO.getCityName().toUpperCase())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT,
-                    String.format("The city [%s] already exists", cityRequestDTO.getCityName()));
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    String.format("The city [%s] already exists", cityRequestDTO.getCityName())
+            );
         }
 
         var area = findAreaOrThrow(cityRequestDTO.getAreaId());
@@ -53,30 +58,36 @@ public class CityServiceImpl implements CityService {
 
     @Override
     public CityResponseDTO getByName(String name) {
-        return Converters.convertCityToResponseDTO(findCityByNameOrThrow(name.toUpperCase()));
+        return Converters.convertCityToResponseDTO(findCityByNameOrThrow(name.toUpperCase() /*to lower case*/));
     }
 
     @Override
     public CityResponseDTO getById(Long id) {
         var city = repository.findById(id).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        String.format("City with id [%s] doesn't exist! ", id)));
+                new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        String.format("City with id [%s] doesn't exist! ", id))
+        );
         return Converters.convertCityToResponseDTO(city);
     }
 
     private Area findAreaOrThrow(Long id) {
         return areaRepository.findById(id).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        String.format("There is no area with id [%s]", id))
+                new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        String.format("There is no area with id [%s]", id)
+                )
         );
     }
 
     private City findCityByNameOrThrow(String name) {
-        var city = repository.findByCityName(name.toUpperCase());
+        var city = repository.findByCityName(name.toUpperCase() /*to lower case*/);
 
         if (city == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                    String.format("No city [%s] found", name));
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    String.format("No city [%s] found", name)
+            );
         }
         return city;
     }

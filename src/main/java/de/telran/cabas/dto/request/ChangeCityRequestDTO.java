@@ -10,9 +10,7 @@ import lombok.NoArgsConstructor;
 public class ChangeCityRequestDTO {
 
     private Long personId;
-
     private Long fromCityId;
-
     private Long toCityId;
 
 }
