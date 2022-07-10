@@ -15,6 +15,7 @@ public class Converters {
         return Area
                 .builder()
                 .areaName(areaRequestDto.getAreaName().toUpperCase())
+                .areaCode(areaRequestDto.getAreaCode().toUpperCase())
                 .build();
     }
 
@@ -22,6 +23,7 @@ public class Converters {
         return AreaResponseDTO
                 .builder()
                 .areaName(area.getAreaName())
+                .areaCode(area.getAreaCode())
                 .id(area.getId())
                 .build();
     }
@@ -31,6 +33,7 @@ public class Converters {
                 .builder()
                 .areaName(area.getAreaName())
                 .areaId(area.getId())
+                .areaCode(area.getAreaCode())
                 .cityIds(cityIds)
                 .build();
     }

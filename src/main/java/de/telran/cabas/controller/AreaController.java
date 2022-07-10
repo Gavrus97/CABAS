@@ -5,24 +5,25 @@ import de.telran.cabas.dto.response.AreaResponseDTO;
 import de.telran.cabas.dto.response.AreaWithCitiesResponseDTO;
 import de.telran.cabas.service.AreaService;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.List;
-import java.util.Optional;
 
+@Validated
 @RestController
 @RequestMapping("/api")
 @AllArgsConstructor
 public class AreaController {
 
-    // final requires for Java to demand a ctor
-    // spring thinks: the only ctor - is an Autowired ctor
-    // lombok + spring make the magic
+
     private final AreaService service;
 
     @PostMapping("/areas")
-    public AreaResponseDTO create(@RequestBody AreaRequestDTO areaDto) {
+    public AreaResponseDTO create(@RequestBody @Valid AreaRequestDTO areaDto) {
         return service.create(areaDto);
     }
 
@@ -32,7 +33,8 @@ public class AreaController {
     }
 
     @GetMapping("/areas")
-    public AreaWithCitiesResponseDTO getByName(@RequestParam(name = "areaName") String areaName) {
+    public AreaWithCitiesResponseDTO getByName(@RequestParam(name = "areaName")
+                                               @NotBlank(message = "Area name cannot be blank") String areaName) {
         return service.getByName(areaName);
     }
 }

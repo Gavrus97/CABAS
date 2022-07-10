@@ -8,26 +8,21 @@ import de.telran.cabas.entity.City;
 import de.telran.cabas.repository.AreaRepository;
 import de.telran.cabas.repository.CityRepository;
 import de.telran.cabas.service.CityService;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.Locale;
 import java.util.stream.Collectors;
 
 @Service
+@AllArgsConstructor
 public class CityServiceImpl implements CityService {
 
-    // same here about final injections
-    @Autowired
-    private CityRepository repository;
-
-    // same here about final injections
-
-    @Autowired
-    private AreaRepository areaRepository;
+    private final CityRepository repository;
+    private final AreaRepository areaRepository;
 
     @Override
     public CityResponseDTO create(CityRequestDTO cityRequestDTO) {
@@ -58,7 +53,7 @@ public class CityServiceImpl implements CityService {
 
     @Override
     public CityResponseDTO getByName(String name) {
-        return Converters.convertCityToResponseDTO(findCityByNameOrThrow(name.toUpperCase() /*to lower case*/));
+        return Converters.convertCityToResponseDTO(findCityByNameOrThrow(name.toUpperCase()));
     }
 
     @Override
@@ -81,7 +76,7 @@ public class CityServiceImpl implements CityService {
     }
 
     private City findCityByNameOrThrow(String name) {
-        var city = repository.findByCityName(name.toUpperCase() /*to lower case*/);
+        var city = repository.findByCityName(name.toUpperCase());
 
         if (city == null) {
             throw new ResponseStatusException(

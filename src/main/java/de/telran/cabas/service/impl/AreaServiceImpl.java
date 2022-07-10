@@ -10,7 +10,6 @@ import de.telran.cabas.repository.AreaRepository;
 import de.telran.cabas.repository.CityRepository;
 import de.telran.cabas.service.AreaService;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,7 +22,6 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class AreaServiceImpl implements AreaService {
 
-    // can be less new lines
     private final AreaRepository repository;
     private final CityRepository cityRepository;
 
@@ -31,14 +29,11 @@ public class AreaServiceImpl implements AreaService {
     @Transactional
     public AreaResponseDTO create(AreaRequestDTO areaRequestDto) {
 
-        // a common approach - is to lowercase instead
         if (repository.existsByAreaName(areaRequestDto.getAreaName().toUpperCase())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
                     String.format("Area with name [%s] already exists ", areaRequestDto.getAreaName()));
         }
 
-        // Converters - is a HUGE class, containing all conversions
-        // it would be better to split it onto smaller pieces (CityConverter, AreaConverter, etc)
         var area = Converters.convertToAreaEntity(areaRequestDto);
         repository.save(area);
 
@@ -49,9 +44,6 @@ public class AreaServiceImpl implements AreaService {
     public List<AreaWithCitiesResponseDTO> getAll() {
         var areas = repository.findAll();
 
-        // Can't see any mentions of 404 in docs
-        // This is a rare case, when list returns anything, but list ([], [1,2,3])
-        // This does not apply to single entities (null, 404)
         if (areas.isEmpty()) {
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND,
@@ -76,21 +68,16 @@ public class AreaServiceImpl implements AreaService {
     }
 
     private Area findAreaByNameOrThrow(String name) {
-        // same here about lowercase
-        var area = repository.findByAreaName(name.toUpperCase());
-
-        if (area == null) {
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND,
-                    String.format("There is no area with name [%s] ", name)
-            );
-        }
-        return area;
+        return repository.findByAreaName(name.toUpperCase()).orElseThrow(
+                () -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        String.format("There is no area with name [%s] ", name)
+                ));
     }
 
 
-    private List<Long> getCityIdsByAreaId(Long id) {
-        return cityRepository.findAllByAreaId(id)
+    private List<Long> getCityIdsByAreaId(Long areaId) {
+        return cityRepository.findAllByAreaId(areaId)
                 .stream()
                 .map(City::getId)
                 .collect(Collectors.toList());

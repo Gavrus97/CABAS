@@ -12,7 +12,7 @@ public interface PersonService {
 
     void update (Long id, UpdatePersonRequestDTO personDTO);
 
-    PersonResponseDTO changeGuardian(Long guardianId, ChangeGuardianRequestDTO changeGuardianRequestDTO);
+    PersonResponseDTO changeGuardian(ChangeGuardianRequestDTO changeGuardianRequestDTO);
 
     PersonResponseDTO getPersonById(Long id);
 

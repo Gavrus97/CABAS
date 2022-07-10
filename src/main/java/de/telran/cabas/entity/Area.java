@@ -20,4 +20,7 @@ public class Area {
     @Column(name = "area_name")
     private String areaName;
 
+    @Column(name = "area_code")
+    private String areaCode;
+
 }
