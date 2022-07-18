@@ -1,5 +1,7 @@
 package de.telran.cabas.entity;
 
+import de.telran.cabas.entity.types.SeverityType;
+import de.telran.cabas.entity.types.SeverityTypeConverter;
 import lombok.*;
 import javax.persistence.*;
 
@@ -22,5 +24,9 @@ public class Area {
 
     @Column(name = "area_code")
     private String areaCode;
+
+    @Column(name = "severity_type")
+    @Convert(converter = SeverityTypeConverter.class)
+    private SeverityType severityType;
 
 }

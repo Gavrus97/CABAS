@@ -1,5 +1,6 @@
 package de.telran.cabas.repository;
 
+import de.telran.cabas.entity.City;
 import de.telran.cabas.entity.Person;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -18,9 +19,11 @@ public interface PersonRepository extends JpaRepository<Person, Long> {
 
     // see a blue circle from the left?
     // this means, you're overriding spring's default method
-    boolean existsById(Long id);
+    //boolean existsById(Long id);
 
     List<Person> findAllByIdIsIn(List<Long> ids);
 
     Optional<Person> findByEmail(String email);
+
+    List<Person> findAllByCityIsIn(List<City> cities);
 }

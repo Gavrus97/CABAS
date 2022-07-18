@@ -5,6 +5,7 @@ import de.telran.cabas.dto.response.*;
 import de.telran.cabas.entity.Area;
 import de.telran.cabas.entity.City;
 import de.telran.cabas.entity.Person;
+import de.telran.cabas.entity.types.SeverityType;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,6 +17,7 @@ public class Converters {
                 .builder()
                 .areaName(areaRequestDto.getAreaName().toUpperCase())
                 .areaCode(areaRequestDto.getAreaCode().toUpperCase())
+                .severityType(SeverityType.GREEN)
                 .build();
     }
 
@@ -25,6 +27,7 @@ public class Converters {
                 .areaName(area.getAreaName())
                 .areaCode(area.getAreaCode())
                 .id(area.getId())
+                .severityType(area.getSeverityType())
                 .build();
     }
 
@@ -34,6 +37,7 @@ public class Converters {
                 .areaName(area.getAreaName())
                 .areaId(area.getId())
                 .areaCode(area.getAreaCode())
+                .severityType(area.getSeverityType())
                 .cityIds(cityIds)
                 .build();
     }
@@ -43,6 +47,7 @@ public class Converters {
                 .cityId(city.getId())
                 .cityName(city.getCityName())
                 .areaId(city.getArea().getId())
+                .severityType(city.getArea().getSeverityType())
                 .build();
 
     }

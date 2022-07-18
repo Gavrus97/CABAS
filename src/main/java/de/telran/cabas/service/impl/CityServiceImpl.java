@@ -9,7 +9,6 @@ import de.telran.cabas.repository.AreaRepository;
 import de.telran.cabas.repository.CityRepository;
 import de.telran.cabas.service.CityService;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -34,11 +33,13 @@ public class CityServiceImpl implements CityService {
         }
 
         var area = findAreaOrThrow(cityRequestDTO.getAreaId());
+
         var city = City.builder()
                 .cityName(cityRequestDTO.getCityName().toUpperCase())
                 .area(area)
                 .build();
         repository.save(city);
+
         return Converters.convertCityToResponseDTO(city);
 
     }

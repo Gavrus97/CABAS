@@ -13,7 +13,7 @@ import javax.validation.constraints.Size;
 @AllArgsConstructor
 public class CityRequestDTO {
 
-    @NotNull(message = "ciryName cannot be null")
+    @NotNull(message = "cityName cannot be null")
     @NotBlank(message = "cityName cannot be blank")
     @Size(min = 3, max = 50, message = "cityName field must contain 3-50 chars")
     private String cityName;

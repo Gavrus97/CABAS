@@ -11,4 +11,6 @@ public interface AreaRepository extends JpaRepository<Area, Long> {
     Boolean existsByAreaName(String areaName);
 
     Optional<Area> findByAreaName(String areaName);
+
+    Optional<Area> findByAreaCode(String areaCode);
 }

@@ -24,4 +24,5 @@ public class City {
     @ManyToOne
     @JoinColumn(name = "area_id")
     private Area area;
+
 }
