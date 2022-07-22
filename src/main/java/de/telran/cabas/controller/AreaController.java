@@ -34,7 +34,7 @@ public class AreaController {
 
     @GetMapping("/areas")
     public AreaWithCitiesResponseDTO getByName(@RequestParam(name = "areaName")
-                                               @NotBlank(message = "Area name cannot be blank") String areaName) {
+                                               @NotBlank(message = "Area name cannot be blank or null") String areaName) {
         return service.getByName(areaName);
     }
 }

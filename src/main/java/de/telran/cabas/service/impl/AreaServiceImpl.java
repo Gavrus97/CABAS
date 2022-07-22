@@ -63,7 +63,7 @@ public class AreaServiceImpl implements AreaService {
 
     @Override
     public AreaWithCitiesResponseDTO getByName(String name) {
-        var area = findAreaByNameOrThrow(name.toUpperCase());
+        var area = findAreaByNameOrThrow(name);
         return Converters.convertAreaToAreaWithCitiesDTO(area, getCityIdsByAreaId(area.getId()));
     }
 

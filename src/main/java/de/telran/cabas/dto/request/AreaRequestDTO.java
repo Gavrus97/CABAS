@@ -2,6 +2,7 @@ package de.telran.cabas.dto.request;
 
 import de.telran.cabas.entity.types.SeverityType;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import javax.validation.constraints.NotBlank;
@@ -11,6 +12,7 @@ import javax.validation.constraints.Size;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
+@Builder
 public class AreaRequestDTO {
 
     @NotNull(message = "areaName cannot be null")
