@@ -1,5 +1,9 @@
 package de.telran.cabas.entity;
 
+import de.telran.cabas.entity.types.GenderType;
+import de.telran.cabas.entity.types.GenderTypeConverter;
+import de.telran.cabas.entity.types.LanguageType;
+import de.telran.cabas.entity.types.LanguageTypeConverter;
 import lombok.*;
 
 import javax.persistence.*;
@@ -27,6 +31,14 @@ public class Person {
 
     @Column(name = "date_of_birth")
     private LocalDate dateOfBirth;
+
+    @Convert(converter = LanguageTypeConverter.class)
+    @Column(name = "language")
+    private LanguageType language;
+
+    @Convert(converter = GenderTypeConverter.class)
+    @Column(name = "gender")
+    private GenderType gender;
 
     @Column(name = "email")
     private String email;

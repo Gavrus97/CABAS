@@ -51,6 +51,8 @@ public class PersonServiceImpl implements PersonService {
                         .firstName(personDTO.getFirstName())
                         .lastName(personDTO.getLastName())
                         .dateOfBirth(personDTO.getDateOfBirth())
+                        .language(personDTO.getLanguage())
+                        .gender(personDTO.getGender())
                         .email(personDTO.getEmail())
                         .phoneNumber(personDTO.getPhoneNumber())
                         .guardianId(guardianId)
@@ -149,9 +151,6 @@ public class PersonServiceImpl implements PersonService {
 
     @Override
     @Transactional
-    // I believe, this is an overhead and overengineering
-    // Checking too many cases, which are not relevant
-    //
     public PersonResponseDTO moveToAnotherCity(ChangeCityRequestDTO cityDTO) {
         var person = getPersonByIdOrThrow(cityDTO.getPersonId());
 
@@ -171,7 +170,6 @@ public class PersonServiceImpl implements PersonService {
 
         person.setCity(city);
         repository.save(person);
-
 
         return Converters.convertPersonIntoResponseDTO(person, getAreaId(city), null, children, city.getId());
     }
@@ -194,7 +192,6 @@ public class PersonServiceImpl implements PersonService {
     }
 
     private void checkIfFromCityMatch(City city, Long cityToCheckId) {
-        // this case is irrelevant
         if (city != null && cityToCheckId == null) {
             throw new ResponseStatusException(
                     HttpStatus.CONFLICT,
@@ -202,7 +199,6 @@ public class PersonServiceImpl implements PersonService {
                             , city.getId()));
         }
 
-        // This case is not realistic. A person is always assigned to a city
         if (city == null && cityToCheckId != null) {
             throw new ResponseStatusException(
                     HttpStatus.CONFLICT,
@@ -270,7 +266,6 @@ public class PersonServiceImpl implements PersonService {
         }
     }
 
-    @Nullable
     private Person getPersonByIdOrThrow(Long id) {
         if (id == null) {
             return null;

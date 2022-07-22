@@ -11,7 +11,5 @@ import lombok.NoArgsConstructor;
 @Builder
 public class NotificationResponseDTO {
 
-    private Long personsId;
-    private String personsPhoneNumber;
-    private String personsEmail;
+    String notification;
 }

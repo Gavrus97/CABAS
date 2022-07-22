@@ -2,7 +2,7 @@ package de.telran.cabas.controller;
 
 import de.telran.cabas.dto.response.NotificationResponseDTO;
 import de.telran.cabas.entity.types.SeverityType;
-import de.telran.cabas.service.NotificationService;
+import de.telran.cabas.service.PeopleToNotifyService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,11 +16,11 @@ import java.util.List;
 @AllArgsConstructor
 public class NotificationController {
 
-    private final NotificationService service;
+    private final PeopleToNotifyService peopleToNotifyService;
 
     @PostMapping("/notifications/notify")
     public List<NotificationResponseDTO> notifyPeople(@RequestParam("area_code") String areaCode,
                                                       @RequestParam("severity") SeverityType severityType) {
-        return service.notifyPeople(areaCode, severityType);
+        return peopleToNotifyService.getPeopleToNotify(areaCode, severityType);
     }
 }

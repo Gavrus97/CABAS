@@ -2,6 +2,7 @@ package de.telran.cabas.entity;
 
 import de.telran.cabas.converter.ListConverter;
 import de.telran.cabas.entity.types.SeverityType;
+import de.telran.cabas.entity.types.SeverityTypeConverter;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -24,10 +25,11 @@ public class Notification {
     @Column(name = "notification_id")
     private Long id;
 
-    @Column(name = "area_id")
-    private Long areaId;
+    @JoinColumn(name = "area_id")
+    @ManyToOne
+    private Area area;
 
-    @Convert(converter = SeverityType.class)
+    @Convert(converter = SeverityTypeConverter.class)
     @Column(name = "severity_status")
     private SeverityType severityType;
 
