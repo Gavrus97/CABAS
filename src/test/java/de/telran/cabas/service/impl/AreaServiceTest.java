@@ -1,7 +1,5 @@
 package de.telran.cabas.service.impl;
 
-import com.fasterxml.jackson.databind.ser.std.ClassSerializer;
-import de.telran.cabas.converter.Converters;
 import de.telran.cabas.dto.request.AreaRequestDTO;
 import de.telran.cabas.dto.response.AreaResponseDTO;
 import de.telran.cabas.entity.Area;
@@ -18,7 +16,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
-import org.springframework.util.Assert;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;

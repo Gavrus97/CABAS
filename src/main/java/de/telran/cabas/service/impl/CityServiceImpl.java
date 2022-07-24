@@ -54,13 +54,13 @@ public class CityServiceImpl implements CityService {
 
     @Override
     public CityResponseDTO getByName(String name) {
-        return Converters.convertCityToResponseDTO(findCityByNameOrThrow(name.toUpperCase()));
+        return Converters.convertCityToResponseDTO(findCityByNameOrThrow(name));
     }
 
     @Override
     public CityResponseDTO getById(Long id) {
-        var city = repository.findById(id).orElseThrow(() ->
-                new ResponseStatusException(
+        var city = repository.findById(id).orElseThrow(
+                () -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND,
                         String.format("City with id [%s] doesn't exist! ", id))
         );
@@ -77,14 +77,12 @@ public class CityServiceImpl implements CityService {
     }
 
     private City findCityByNameOrThrow(String name) {
-        var city = repository.findByCityName(name.toUpperCase());
-
-        if (city == null) {
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND,
-                    String.format("No city [%s] found", name)
-            );
-        }
-        return city;
+        return repository.findByCityName(name.toUpperCase())
+                .orElseThrow(
+                        () -> new ResponseStatusException(
+                                HttpStatus.NOT_FOUND,
+                                String.format("No city [%s] found", name)
+                        )
+                );
     }
 }

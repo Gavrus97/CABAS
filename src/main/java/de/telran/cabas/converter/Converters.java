@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 public class Converters {
 
-    public static Area convertToAreaEntity(AreaRequestDTO areaRequestDto){
+    public static Area convertToAreaEntity(AreaRequestDTO areaRequestDto) {
         return Area
                 .builder()
                 .areaName(areaRequestDto.getAreaName().toUpperCase())
@@ -21,7 +21,7 @@ public class Converters {
                 .build();
     }
 
-    public static AreaResponseDTO convertAreaToResponseDTO(Area area){
+    public static AreaResponseDTO convertAreaToResponseDTO(Area area) {
         return AreaResponseDTO
                 .builder()
                 .areaName(area.getAreaName())
@@ -42,19 +42,22 @@ public class Converters {
                 .build();
     }
 
-    public static CityResponseDTO convertCityToResponseDTO(City city){
+    public static CityResponseDTO convertCityToResponseDTO(City city) {
+        var areaId = city.getArea() == null ? null : city.getArea().getId();
+        var severity = city.getArea() == null ? null : city.getArea().getSeverityType();
+
         return CityResponseDTO.builder()
                 .cityId(city.getId())
                 .cityName(city.getCityName())
-                .areaId(city.getArea().getId())
-                .severityType(city.getArea().getSeverityType())
+                .areaId(areaId)
+                .severityType(severity)
                 .build();
 
     }
 
     public static PersonResponseDTO convertPersonIntoResponseDTO(Person person, Long areaId,
                                                                  Person guardian, List<Person> children,
-                                                                 Long cityId){
+                                                                 Long cityId) {
         return PersonResponseDTO
                 .builder()
                 .firstName(person.getFirstName())
@@ -68,8 +71,8 @@ public class Converters {
                 .build();
     }
 
-    public static GuardianResponseDTO convertPersonToGuardianDTO(Person person){
-        if(person == null){
+    public static GuardianResponseDTO convertPersonToGuardianDTO(Person person) {
+        if (person == null) {
             return null;
         }
         return GuardianResponseDTO
@@ -81,7 +84,7 @@ public class Converters {
                 .build();
     }
 
-    public static ChildResponseDTO convertPersonIntoChildResponseDTO(Person person){
+    public static ChildResponseDTO convertPersonIntoChildResponseDTO(Person person) {
 
         return ChildResponseDTO
                 .builder()
@@ -92,7 +95,7 @@ public class Converters {
                 .build();
     }
 
-    public static List<ChildResponseDTO> convertListPersonIntoListChildDTO(List<Person> people){
+    public static List<ChildResponseDTO> convertListPersonIntoListChildDTO(List<Person> people) {
         return people
                 .stream()
                 .map(Converters::convertPersonIntoChildResponseDTO)
