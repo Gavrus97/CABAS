@@ -8,6 +8,7 @@ import de.telran.cabas.entity.Person;
 import de.telran.cabas.repository.NotificationRepository;
 import de.telran.cabas.service.NotificationService;
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 
@@ -39,7 +40,7 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
 
-    private String getNotificationMessage(Person person, Area area) {
+    protected String getNotificationMessage(Person person, Area area) {
         String statusSuffix = area.getSeverityType().getExternalId();
         String language = person.getLanguage().getLanguageExternalId();
         String gender = person.getGender().getExternalId();
@@ -66,7 +67,7 @@ public class NotificationServiceImpl implements NotificationService {
         );
     }
 
-    private void saveNotification(List<Person> people, Area area) {
+    protected void saveNotification(List<Person> people, Area area) {
         Notification notification = Notification.builder()
                 .area(area)
                 .severityType(area.getSeverityType())
