@@ -1,6 +1,5 @@
 package de.telran.cabas.dto.request;
 
-import de.telran.cabas.entity.types.LanguageType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

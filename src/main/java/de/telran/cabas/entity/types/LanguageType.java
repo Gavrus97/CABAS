@@ -13,7 +13,8 @@ import java.util.Arrays;
 public enum LanguageType {
 
     ENGLISH(1, "en"),
-    RUSSIAN(2, "ru");
+    RUSSIAN(2, "ru"),
+    DEUTSCH(3, "de");
 
     private final Integer languageId;
     private final String languageExternalId;

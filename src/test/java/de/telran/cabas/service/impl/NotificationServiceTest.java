@@ -9,24 +9,16 @@ import de.telran.cabas.repository.NotificationRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.MessageSource;
 
 @ExtendWith(MockitoExtension.class)
 public class NotificationServiceTest {
 
-    @Mock
-    private MessageSource messageSource;
-
-    @Mock
-    private NotificationRepository notificationRepository;
-
-    @InjectMocks
-    private NotificationServiceImpl service;
+    private final MessageSource messageSource = Mockito.spy(MessageSource.class);
+    private final NotificationRepository repository = Mockito.mock(NotificationRepository.class);
+    private final NotificationServiceImpl service = new NotificationServiceImpl(messageSource,repository);
 
     @Test
     public void shouldReturnMessageForFemaleRus() {
@@ -50,7 +42,5 @@ public class NotificationServiceTest {
                 "Уважаемая, %s %s. Ковидный статус в вашем городе Красный", person.getFirstName(), person.getLastName());
 
         Assertions.assertEquals(expectedMessage, service.getNotificationMessage(person,area));
-
-
     }
 }
